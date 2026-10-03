@@ -3,8 +3,7 @@ import { distance, type Point } from '../math'
 import { Loupe } from './Loupe'
 import type { Annotation, FaceFacing, PlateDoc, Tool } from './types'
 import { newId } from './types'
-
-type View = { x: number; y: number; scale: number }
+import { clientToImage, clientToImageBox, plateImageStyle, type View } from './viewGeometry'
 type LineDraft = { kind: 'reference' | 'measure' | 'horizon' | 'waterline'; a: Point; cursor: Point }
 type CylinderDraft = { points: Point[]; cursor: Point | null }
 type AreaDraft = { points: Point[]; cursor: Point | null; facing: FaceFacing }
@@ -45,19 +44,20 @@ export function PlateView({
   const [imageEl, setImageEl] = useState<HTMLImageElement | null>(null)
   const pan = useRef<{ x: number; y: number; view: View } | null>(null)
   const lineRef = useRef<LineDraft | null>(null)
+  const userAdjusted = useRef(false)
 
   useEffect(() => {
     const node = viewport.current
     if (!node) return
-    let done = false
-    const observer = new ResizeObserver(() => {
-      if (done || node.clientWidth < 32 || node.clientHeight < 32) return
+    userAdjusted.current = false
+    const apply = () => {
+      if (userAdjusted.current || node.clientWidth < 32 || node.clientHeight < 32) return
       setView(fit(node.clientWidth, node.clientHeight, doc.width, doc.height))
       setReady(true)
-      done = true
-      observer.disconnect()
-    })
+    }
+    const observer = new ResizeObserver(apply)
     observer.observe(node)
+    apply()
     return () => observer.disconnect()
   }, [doc.id, doc.width, doc.height])
 
@@ -69,12 +69,24 @@ export function PlateView({
   }, [tool, doc.id])
 
   function toImage(event: { clientX: number; clientY: number }): Point {
+    const box = imageRef.current?.getBoundingClientRect()
+    if (box && box.width > 0 && box.height > 0) {
+      return clientToImageBox(event.clientX, event.clientY, box, doc.width, doc.height)
+    }
     const rect = viewport.current?.getBoundingClientRect()
     if (!rect) return { x: 0, y: 0 }
-    return {
-      x: (event.clientX - rect.left - view.x) / view.scale,
-      y: (event.clientY - rect.top - view.y) / view.scale,
-    }
+    return clientToImage(event.clientX, event.clientY, rect, view)
+  }
+
+  function hideLoupe() {
+    setHover(null)
+    setAnchor(null)
+  }
+
+  function pointerOutside(event: { clientX: number; clientY: number }) {
+    const rect = viewport.current?.getBoundingClientRect()
+    if (!rect) return true
+    return event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom
   }
 
   function commitLine(kind: LineDraft['kind'], a: Point, b: Point) {
@@ -108,6 +120,7 @@ export function PlateView({
     if (event.button !== 0) return
     const point = toImage(event)
     if (tool === 'pan') {
+      userAdjusted.current = true
       pan.current = { x: event.clientX, y: event.clientY, view }
       viewport.current?.setPointerCapture(event.pointerId)
       return
@@ -182,17 +195,19 @@ export function PlateView({
   }
 
   function onPointerUp(event: ReactPointerEvent) {
-    if (pan.current) {
-      pan.current = null
-      return
+    if (pan.current) pan.current = null
+    else {
+      const pending = lineRef.current
+      if (pending) {
+        const point = toImage(event)
+        if (distance(pending.a, point) > 6) commitLine(pending.kind, pending.a, point)
+      }
     }
-    const pending = lineRef.current
-    if (!pending) return
-    const point = toImage(event)
-    if (distance(pending.a, point) > 6) commitLine(pending.kind, pending.a, point)
+    if (event.pointerType !== 'mouse' || pointerOutside(event)) hideLoupe()
   }
 
   function onWheel(event: ReactWheelEvent) {
+    userAdjusted.current = true
     event.preventDefault()
     const rect = viewport.current?.getBoundingClientRect()
     if (!rect) return
@@ -219,9 +234,18 @@ export function PlateView({
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onPointerLeave={hideLoupe}
+        onPointerCancel={hideLoupe}
         onWheel={onWheel}
       >
-        <div className="plate-layer" style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})` }}>
+        <div
+          className="plate-layer"
+          style={{
+            width: doc.width,
+            height: doc.height,
+            transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
+          }}
+        >
           <img
             ref={(node) => {
               imageRef.current = node
@@ -232,6 +256,7 @@ export function PlateView({
             width={doc.width}
             height={doc.height}
             draggable={false}
+            style={plateImageStyle}
           />
           <svg viewBox={`0 0 ${doc.width} ${doc.height}`} width={doc.width} height={doc.height}>
             {doc.annotations.map((ann) => (
@@ -255,7 +280,9 @@ export function PlateView({
             ) : null}
           </svg>
         </div>
-        {loupeOn ? <Loupe image={imageEl} point={hover} zoom={loupeZoom} viewScale={view.scale} anchor={anchor} /> : null}
+        {loupeOn && hover && anchor ? (
+          <Loupe image={imageEl} point={hover} zoom={loupeZoom} viewScale={view.scale} anchor={anchor} />
+        ) : null}
       </div>
     </div>
   )
