@@ -58,6 +58,7 @@ export function volumeLabel(unit: LengthUnit): string {
 
 /** Same rounding the v0.9.4 readout used. */
 export function formatNumber(value: number): string {
+  if (!Number.isFinite(value)) return '—'
   const t = Math.abs(value)
   if (t === 0) return '0'
   if (t >= 1000) return value.toLocaleString(undefined, { maximumFractionDigits: 1 })

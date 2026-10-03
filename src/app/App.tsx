@@ -210,10 +210,10 @@ export function App() {
                 annotations: doc.annotations.map((ann) => (ann.id === id && ann.kind === 'measure' ? { ...ann, ...patch } : ann)),
               }))
             }
-            onChangeArea={(id, turnDeg) =>
+            onChangeArea={(id, patch) =>
               patchDoc(active.id, (doc) => ({
                 ...doc,
-                annotations: doc.annotations.map((ann) => (ann.id === id && ann.kind === 'area' ? { ...ann, turnDeg } : ann)),
+                annotations: doc.annotations.map((ann) => (ann.id === id && ann.kind === 'area' ? { ...ann, ...patch } : ann)),
               }))
             }
             onLock={setLockId}

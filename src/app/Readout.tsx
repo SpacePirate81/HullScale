@@ -1,7 +1,7 @@
-import type { LengthUnit } from '../math'
-import { LENGTH_UNITS } from '../math'
+import { useState } from 'react'
+import { LENGTH_UNITS, PLANE_ANGLE_LIMIT_DEG, type LengthUnit, type TopLengthAxis } from '../math'
 import { buildReport } from './report'
-import type { MeasureAnn, PlateDoc } from './types'
+import type { AreaAnn, MeasureAnn, PlateDoc } from './types'
 
 export function Readout({
   doc,
@@ -19,7 +19,7 @@ export function Readout({
   selectedId: string | null
   onSelect: (id: string) => void
   onChangeMeasure: (id: string, patch: Partial<MeasureAnn>) => void
-  onChangeArea: (id: string, turnDeg: number | null) => void
+  onChangeArea: (id: string, patch: Partial<Pick<AreaAnn, 'turnDeg' | 'lengthAxis'>>) => void
   onLock: (id: string) => void
   onDelete: (id: string) => void
   onCopy: () => void
@@ -29,11 +29,13 @@ export function Readout({
     <aside className="readout" aria-label="Readings">
       <h2>SCALE</h2>
       <p className="scale-line" data-scale={report.pxPerM ?? ''}>
-        {report.locked
-          ? report.horizon
-            ? `${report.pxPerM?.toFixed(2)} px/m at the locks · horizon shifts it`
-            : `${report.pxPerM?.toFixed(2)} px/m`
-          : 'Pixels only — lock a reference'}
+        {report.pxPerM == null
+          ? report.locked
+            ? 'Locked scale is not usable'
+            : 'Pixels only — lock a reference'
+          : report.horizon
+            ? `${report.pxPerM.toFixed(2)} px/m at the locks · horizon shifts it`
+            : `${report.pxPerM.toFixed(2)} px/m`}
       </p>
       <p className="note">{report.horizon ? 'Only the horizon changes scale.' : 'A waterline never changes scale.'}</p>
       {report.flags.map((flag) => (
@@ -63,6 +65,7 @@ export function Readout({
                 <div className="primary">{row.primary}</div>
                 {row.pair ? <p className="pair">{row.pair}</p> : null}
                 {row.barText ? <p className="note">{row.barText}</p> : null}
+                {row.warning && !/^Angle not set\./i.test(row.warning) ? <p className="warn-line">{row.warning}</p> : null}
               </div>
             </header>
             {selected && ann?.kind === 'measure' ? (
@@ -95,39 +98,51 @@ export function Readout({
       ))}
       <h2>AREA</h2>
       {report.areas.length === 0 ? <p className="note">Area is the face as it appears, until you type a turn.</p> : null}
-      {report.areas.map((row) => (
-        <article key={row.id} className="row" onClick={() => onSelect(row.id)}>
-          <header>
-            <span className="mark">{row.mark}</span>
-            <div>
+      {report.areas.map((row) => {
+        const ann = doc.annotations.find((item) => item.id === row.id)
+        return (
+          <article key={row.id} className="row" onClick={() => onSelect(row.id)}>
+            <header>
+              <span className="mark">{row.mark}</span>
               <div>
-                {row.facing} face
+                <div>{row.facing} face</div>
+                <div className="primary">{row.primary}</div>
+                {row.warning ? <p className="warn-line">{row.warning}</p> : null}
               </div>
-              <div className="primary">{row.primary}</div>
-              {row.warning ? <p className="warn-line">{row.warning}</p> : null}
-            </div>
-          </header>
-          {selectedId === row.id ? (
-            <div className="fields">
-              <label>
-                Turn out of the picture, degrees
-                <input
-                  type="number"
-                  step="any"
+            </header>
+            {selectedId === row.id && ann?.kind === 'area' ? (
+              <div className="fields">
+                <DegreesField
+                  label="Turn out of the picture, degrees"
                   placeholder="optional"
-                  onChange={(event) => {
-                    const value = event.target.value
-                    onChangeArea(row.id, value === '' ? null : Number(value))
-                  }}
+                  value={ann.turnDeg}
+                  onChange={(turnDeg) => onChangeArea(row.id, { turnDeg })}
                 />
-              </label>
-              <button type="button" className="linkish" onClick={() => onDelete(row.id)}>
-                Delete
-              </button>
-            </div>
-          ) : null}
-        </article>
-      ))}
+                {ann.facing === 'top' ? (
+                  <label>
+                    Length on this top view
+                    <select
+                      value={ann.lengthAxis ?? ''}
+                      onChange={(event) => {
+                        const value = event.target.value
+                        const lengthAxis: TopLengthAxis | null = value === 'x' || value === 'y' ? value : null
+                        onChangeArea(row.id, { lengthAxis })
+                      }}
+                    >
+                      <option value="">Match the other faces</option>
+                      <option value="x">Runs left-right</option>
+                      <option value="y">Runs up-down</option>
+                    </select>
+                  </label>
+                ) : null}
+                <button type="button" className="linkish" onClick={() => onDelete(row.id)}>
+                  Delete
+                </button>
+              </div>
+            ) : null}
+          </article>
+        )
+      })}
       <h2>VOLUME</h2>
       {report.prisms.map((row) => (
         <article key={row.id} className="row">
@@ -144,6 +159,50 @@ export function Readout({
   )
 }
 
+function DegreesField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string
+  value: number | null | undefined
+  onChange: (value: number | null) => void
+  placeholder?: string
+}) {
+  const shown = value == null || Number.isNaN(value) ? null : value
+  const [text, setText] = useState(shown == null ? '' : String(shown))
+  const [seen, setSeen] = useState(shown)
+  if (seen !== shown) {
+    setSeen(shown)
+    setText(shown == null ? '' : String(shown))
+  }
+  return (
+    <label>
+      {label}
+      <input
+        type="number"
+        min={-PLANE_ANGLE_LIMIT_DEG}
+        max={PLANE_ANGLE_LIMIT_DEG}
+        step="any"
+        placeholder={placeholder}
+        value={text}
+        onChange={(event) => {
+          const raw = event.target.value
+          setText(raw)
+          if (raw.trim() === '') {
+            onChange(null)
+            return
+          }
+          const angle = Number(raw)
+          if (!Number.isFinite(angle)) return
+          onChange(angle)
+        }}
+      />
+    </label>
+  )
+}
+
 function MeasureFields({
   ann,
   onChange,
@@ -157,16 +216,12 @@ function MeasureFields({
 }) {
   return (
     <div className="fields">
-      <label>
-        Angle out of the plane, degrees
-        <input
-          type="number"
-          step="any"
-          placeholder="optional — blank leaves it uncorrected"
-          value={ann.angleDeg ?? ''}
-          onChange={(event) => onChange({ angleDeg: event.target.value === '' ? null : Number(event.target.value) })}
-        />
-      </label>
+      <DegreesField
+        label="Angle out of the plane, degrees"
+        placeholder="optional — blank leaves it uncorrected"
+        value={ann.angleDeg}
+        onChange={(angleDeg) => onChange({ angleDeg })}
+      />
       <label>
         Doubt in that angle, degrees
         <input
@@ -174,9 +229,15 @@ function MeasureFields({
           min="0"
           step="any"
           value={ann.angleUncertaintyDeg ?? ''}
-          onChange={(event) =>
-            onChange({ angleUncertaintyDeg: event.target.value === '' ? null : Number(event.target.value) })
-          }
+          onChange={(event) => {
+            if (event.target.value === '') {
+              onChange({ angleUncertaintyDeg: null })
+              return
+            }
+            const doubt = Number(event.target.value)
+            if (!Number.isFinite(doubt) || doubt < 0) return
+            onChange({ angleUncertaintyDeg: doubt })
+          }}
         />
       </label>
       <label>

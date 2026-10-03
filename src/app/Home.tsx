@@ -14,7 +14,7 @@ export function Home({ onSample, onFile }: { onSample: (sample: SamplePlate) => 
           </div>
           <p className="lede">
             Lock a known length on a photograph. Everything else converts. Starship stays a cylinder, not a cone. Area is
-            projected. Volume is a lower-bound prism.
+            projected. Volume is the box around the faces you draw, an upper bound.
           </p>
           <p className="version">v{APP_VERSION}</p>
           <label className="file-btn">
@@ -58,7 +58,7 @@ export function Home({ onSample, onFile }: { onSample: (sample: SamplePlate) => 
           <li>
             <span>03</span>
             <b>Faces, not guesses</b>
-            Area is projected as seen. Prism volume is a lower bound from orthogonal faces. A horizon, not a waterline,
+            Area is projected as seen. Prism volume is an upper bound from the boxes around orthogonal faces. A horizon, not a waterline,
             changes the scale.
           </li>
         </ol>

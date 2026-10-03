@@ -1,4 +1,4 @@
-import type { ClickClass, EdgeKind, FaceFacing, PlaneTag, Point } from '../math'
+import type { ClickClass, EdgeKind, FaceFacing, PlaneTag, Point, TopLengthAxis } from '../math'
 
 export type { FaceFacing }
 
@@ -40,6 +40,8 @@ export type AreaAnn = {
   facing: FaceFacing
   structureId: string
   turnDeg?: number | null
+  /** Top view only. Which way the ship's length runs. Unset: match the other faces. */
+  lengthAxis?: TopLengthAxis | null
 }
 
 export type HorizonAnn = {

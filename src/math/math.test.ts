@@ -3,10 +3,12 @@ import {
   CLICK_PX,
   CU_METRES_PER_CU_FOOT,
   DECISIONS,
+  angleShare,
   coneVolume,
   cylinderMeasure,
   cylinderVolume,
   errorBar,
+  formatNumber,
   fromCubicMetres,
   fromMetres,
   fromSquareMetres,
@@ -19,10 +21,12 @@ import {
   pixelsPerMetre,
   prismVolume,
   projectedArea,
+  referenceAnchor,
   riseAndRun,
   scaleAt,
   scaleDisagreements,
   SQ_METRES_PER_SQ_FOOT,
+  STEEP_PLANE_ANGLE_DEG,
   toMetres,
   trueArea,
   type ScaleRef,
@@ -350,5 +354,249 @@ describe('10. angles and the error bar', () => {
     })
     expect(loose.rel).toBeGreaterThan(steady.rel)
     expect(lengthOutOfPlane(10, 60).metres).toBeCloseTo(20, 10)
+  })
+})
+
+describe('11. prism label and top-view axis', () => {
+  const refs = [lock(1, 1)]
+  const box = (w: number, h: number) => [px(0, 0), px(w, 0), px(w, h), px(0, h)]
+
+  it('calls the bounding box an upper bound', () => {
+    const prism = prismVolume(
+      [
+        { facing: 'front', points: box(10, 4) },
+        { facing: 'side', points: box(20, 4) },
+      ],
+      refs,
+      null,
+    )
+    expect(prism.volumeM3).toBeCloseTo(800, 8)
+    expect(prism.note).toMatch(/upper-bound/i)
+    expect(prism.note).not.toMatch(/lower-bound|inscribed/i)
+  })
+
+  it('keeps a plan whose length runs left-right from swapping beam and length', () => {
+    const vanguard = prismVolume(
+      [
+        { facing: 'front', points: box(70, 15.5) },
+        { facing: 'side', points: box(275, 15.5) },
+        { facing: 'top', points: box(275, 70) },
+      ],
+      refs,
+      null,
+    )
+    expect(vanguard.volumeM3).toBeCloseTo(275 * 70 * 15.5, 6)
+    expect(vanguard.note).toMatch(/left-right/)
+
+    const beamLeftRight = prismVolume(
+      [
+        { facing: 'front', points: box(70, 15.5) },
+        { facing: 'side', points: box(275, 15.5) },
+        { facing: 'top', points: box(70, 275) },
+      ],
+      refs,
+      null,
+    )
+    expect(beamLeftRight.volumeM3).toBeCloseTo(275 * 70 * 15.5, 6)
+    expect(beamLeftRight.note).toMatch(/up-down/)
+  })
+
+  it('uses a tagged axis and warns when that tag fights the other faces', () => {
+    const tagged = prismVolume(
+      [
+        { facing: 'front', points: box(70, 15.5) },
+        { facing: 'side', points: box(275, 15.5) },
+        { facing: 'top', points: box(275, 70), lengthAxis: 'y' },
+      ],
+      refs,
+      null,
+    )
+    expect(tagged.volumeM3).toBeCloseTo(70 * 70 * 15.5, 6)
+    expect(tagged.note).toMatch(/does not match/)
+  })
+
+  it('asks for a tag when the top view could run either way', () => {
+    const ambiguous = prismVolume(
+      [
+        { facing: 'front', points: box(100, 10) },
+        { facing: 'top', points: box(90, 110) },
+      ],
+      refs,
+      null,
+    )
+    expect(ambiguous.volumeM3).not.toBeNull()
+    expect(ambiguous.note).toMatch(/either way/)
+  })
+})
+
+describe('12. angles stay in range', () => {
+  it('refuses angles past the limit instead of going negative', () => {
+    const turned = lengthOutOfPlane(10, 120)
+    expect(turned.metres).toBeCloseTo(10, 8)
+    expect(turned.metres).toBeGreaterThan(0)
+    expect(turned.corrected).toBe(false)
+    expect(turned.warning).toMatch(/-89 and 89/)
+    expect(lengthOutOfPlane(10, -120).metres).toBeCloseTo(10, 8)
+    expect(trueArea(10, 135).metres2).toBeCloseTo(10, 8)
+    expect(trueArea(10, 135).corrected).toBe(false)
+    expect(trueArea(10, 135).metres2).toBeGreaterThan(0)
+    expect(angleShare(120, 5)).toBe(0)
+  })
+
+  it('treats a negative angle the same as its positive twin', () => {
+    expect(lengthOutOfPlane(10, -60).metres).toBeCloseTo(20, 8)
+    expect(lengthOutOfPlane(10, -60).warning).toBeNull()
+    expect(lengthAlongShip(32.3, 0).warning).toBeNull()
+  })
+
+  it('warns when a steep angle is still inside the limit', () => {
+    const steep = lengthOutOfPlane(10, 80)
+    expect(steep.corrected).toBe(true)
+    expect(steep.metres).toBeCloseTo(10 / Math.cos((80 * Math.PI) / 180), 8)
+    expect(steep.warning).toMatch(/steep/i)
+    expect(STEEP_PLANE_ANGLE_DEG).toBe(75)
+    const edge = lengthOutOfPlane(10, 89)
+    expect(edge.metres).toBeGreaterThan(0)
+    expect(edge.metres).toBeCloseTo(10 / Math.cos((89 * Math.PI) / 180), 6)
+    expect(edge.warning).toMatch(/steep/i)
+    expect(Number.isFinite(angleShare(89, 1))).toBe(true)
+    const area = trueArea(10, 80)
+    expect(area.metres2).toBeCloseTo(10 / Math.cos((80 * Math.PI) / 180), 8)
+    expect(area.warning).toMatch(/steep/i)
+  })
+
+  it('does not turn Infinity or NaN into a NaN length', () => {
+    const infinite = lengthOutOfPlane(10, Number.POSITIVE_INFINITY)
+    expect(infinite.metres).toBeCloseTo(10, 8)
+    expect(infinite.corrected).toBe(false)
+    expect(infinite.warning).toMatch(/not a real number/i)
+    const missing = lengthOutOfPlane(10, Number.NaN)
+    expect(missing.metres).toBeCloseTo(10, 8)
+    expect(missing.warning).toMatch(/not a real number/i)
+    expect(angleShare(Number.POSITIVE_INFINITY, 2)).toBe(0)
+    expect(angleShare(Number.NaN, 2)).toBe(0)
+    expect(lengthOutOfPlane(Number.NaN, 0).metres).toBeNull()
+  })
+})
+
+describe('13. horizon read-back, masts, and the sky', () => {
+  const horizon = { a: px(0, 0), b: px(1000, 0) }
+  const flipped = { a: px(1000, 0), b: px(0, 0) }
+
+  it('reads a level reference back as its own length', () => {
+    const a = px(0, 100)
+    const b = px(200, 100)
+    const refs = [{ at: referenceAnchor(a, b, horizon), metresPerPx: 50 / 200 }]
+    expect(photoLength(a, b, refs, horizon)).toBeCloseTo(50, 8)
+  })
+
+  it('reads a vertical reference back from the scale at its base', () => {
+    const top = px(40, 50)
+    const base = px(40, 150)
+    const refs = [{ at: referenceAnchor(top, base, horizon), metresPerPx: 50 / 100 }]
+    expect(referenceAnchor(top, base, horizon)).toEqual(base)
+    expect(photoLength(top, base, refs, horizon)).toBeCloseTo(50, 8)
+    expect(photoLength(top, base, refs, flipped)).toBeCloseTo(50, 8)
+  })
+
+  it('gives points on or above the horizon no scale', () => {
+    const refs = [{ at: px(0, 100), metresPerPx: 0.25 }]
+    expect(scaleAt(px(0, 0), refs, horizon)).toBeNull()
+    expect(scaleAt(px(0, -100), refs, horizon)).toBeNull()
+    expect(scaleAt(px(0, -100), refs, flipped)).toBeNull()
+    expect(scaleAt(px(0, 200), refs, flipped)).toBeCloseTo(0.125, 8)
+  })
+})
+
+describe('14. reversed cylinder rails', () => {
+  it('recovers the same length when the second rail is drawn backwards', () => {
+    const forwardA: [ReturnType<typeof px>, ReturnType<typeof px>] = [px(0, 0), px(840, 0)]
+    const forwardB: [ReturnType<typeof px>, ReturnType<typeof px>] = [px(0, 44.4), px(840, 44.4)]
+    const reversedB: [ReturnType<typeof px>, ReturnType<typeof px>] = [px(840, 44.4), px(0, 44.4)]
+    const forward = cylinderMeasure(forwardA, forwardB, 3.7, [], null)
+    const backward = cylinderMeasure(forwardA, reversedB, 3.7, [], null)
+    expect(backward.lengthM).toBeCloseTo(70, 6)
+    expect(backward.lengthM).toBeCloseTo(forward.lengthM ?? 0, 6)
+    expect(backward.volumeM3).toBeCloseTo(forward.volumeM3 ?? 0, 6)
+    expect(backward.warning).toBeNull()
+  })
+})
+
+describe('15. bad inputs', () => {
+  it('warns on a zero-length line instead of a huge uncertainty', () => {
+    const bar = errorBar({
+      metres: 0,
+      lengthPx: 0,
+      clickClass: 'finger',
+      referenceClicked: false,
+      angleDeg: 0,
+      plane: 'same',
+    })
+    expect(bar.rel).toBe(0)
+    expect(bar.sigmaM).toBeNull()
+    expect(bar.rel).toBeLessThan(1)
+    expect(bar.warnings.some((warning) => /zero/i.test(warning.text))).toBe(true)
+  })
+
+  it('rejects a zero or non-real scale', () => {
+    expect(pixelsPerMetre(0)).toBeNull()
+    expect(pixelsPerMetre(Number.POSITIVE_INFINITY)).toBeNull()
+    expect(pixelsPerMetre(Number.NaN)).toBeNull()
+    expect(metresPerPixel(0, 10)).toBeNull()
+    expect(metresPerPixel(10, 0)).toBeNull()
+    expect(metresPerPixel(Number.NaN, 10)).toBeNull()
+    expect(metresPerPixel(Number.POSITIVE_INFINITY, 10)).toBeNull()
+    expect(scaleAt(px(0, 0), [{ at: px(0, 0), metresPerPx: 0 }], null)).toBeNull()
+    expect(scaleDisagreements([{ at: px(0, 0), metresPerPx: 0 }])[0]).toMatch(/zero or not a real number/i)
+    expect(formatNumber(Number.NaN)).toBe('—')
+    expect(formatNumber(Number.POSITIVE_INFINITY)).toBe('—')
+    const bar = errorBar({
+      metres: Number.NaN,
+      lengthPx: 100,
+      referenceClicked: false,
+      angleDeg: 0,
+      plane: 'same',
+    })
+    expect(bar.sigmaM).toBeNull()
+    expect(bar.warnings.some((warning) => /not a real number/i.test(warning.text))).toBe(true)
+  })
+})
+
+describe('16. pinhole camera ground truth', () => {
+  // Level camera, image y positive downward, horizon on the optical axis.
+  // A world point (X, Y, Z) lands at (f X / Z, f (H - Y) / Z).
+  const focal = 800
+  const cameraHeight = 12
+  const project = (x: number, y: number, z: number) => px((focal * x) / z, (focal * (cameraHeight - y)) / z)
+
+  it('matches lateral ground lengths and mast heights from the 3D scene', () => {
+    const horizon = { a: px(-2000, 0), b: px(2000, 0) }
+    const near = project(-15, 0, 240)
+    const far = project(15, 0, 240)
+    const known = 30
+    const mpp = known / Math.hypot(far.x - near.x, far.y - near.y)
+    const refs: ScaleRef[] = [{ at: referenceAnchor(near, far, horizon), metresPerPx: mpp }]
+
+    expect(photoLength(near, far, refs, horizon)).toBeCloseTo(known, 6)
+
+    const beamA = project(-5, 0, 80)
+    const beamB = project(5, 0, 80)
+    expect(photoLength(beamA, beamB, refs, horizon)).toBeCloseTo(10, 6)
+
+    const mastBase = project(0, 0, 80)
+    const mastTop = project(0, 18, 80)
+    expect(mastTop.y).toBeLessThan(0)
+    expect(photoLength(mastBase, mastTop, refs, horizon)).toBeCloseTo(18, 6)
+
+    const shortTop = project(0, 6, 80)
+    expect(shortTop.y).toBeGreaterThan(0)
+    expect(photoLength(mastBase, shortTop, refs, horizon)).toBeCloseTo(6, 6)
+
+    expect(scaleAt(px(0, 0), refs, horizon)).toBeNull()
+    expect(scaleAt(project(0, cameraHeight + 4, 80), refs, horizon)).toBeNull()
+
+    const flipped = { a: horizon.b, b: horizon.a }
+    expect(photoLength(beamA, beamB, refs, flipped)).toBeCloseTo(10, 6)
+    expect(photoLength(mastBase, mastTop, refs, flipped)).toBeCloseTo(18, 6)
   })
 })
