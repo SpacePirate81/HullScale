@@ -9,6 +9,7 @@ import { SAMPLES, type SamplePlate } from './samples'
 import { Toolbar, TOOL_KEYS } from './Toolbar'
 import type { Annotation, FaceFacing, PlateDoc, Tool } from './types'
 import { newId } from './types'
+import { publicUrl } from './publicUrl'
 import { APP_VERSION } from './version'
 
 export function App() {
@@ -134,7 +135,7 @@ export function App() {
     <div className="app">
       <header className="topbar">
         <button type="button" className="brand" onClick={() => setActiveId(null)}>
-          <img src="/favicon.svg" alt="" />
+          <img src={publicUrl('favicon.svg')} alt="" />
           <span className="wordmark">HULLSCALE</span>
         </button>
         <span className="version">v{APP_VERSION}</span>

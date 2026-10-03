@@ -12,13 +12,24 @@ scale, optional angle, cylinder volume on the readout) are in `src/math/decision
 ```bash
 npm install
 npm test          # math engine checks, including the sample-plate scales
-npm run dev       # http://localhost:5173
-npm run build     # static site in dist/
-npm run preview   # serve that site locally
+npm run dev       # http://localhost:5173/HullScale/
+npm run build     # static site in dist/, paths rooted at /HullScale/
+npm run preview   # serve that site locally, also under /HullScale/
 ```
 
 `dist/` is the deployable site: `index.html`, hashed assets, the eight plates, icons, and the
-PWA manifest. A small service worker is registered so a phone can install it.
+PWA manifest. A small service worker is registered so a phone can install it. Asset, plate,
+manifest, and service-worker URLs use the `/HullScale/` prefix so the site works at
+https://spacepirate81.github.io/HullScale/.
+
+## Publish
+
+A push to `main` runs `.github/workflows/pages.yml`. That workflow builds the app and deploys
+`dist/` to GitHub Pages with the official Pages actions.
+
+The workflow cannot turn Pages on. In the repo on GitHub, open Settings, then Pages, then under
+Build and deployment set Source to GitHub Actions. After this branch is merged to `main`, that
+push publishes the site.
 
 ## Snapshot of v0.9.4
 

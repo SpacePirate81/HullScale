@@ -1,3 +1,4 @@
+import { publicUrl } from './publicUrl'
 import { SAMPLES, type SamplePlate } from './samples'
 import { APP_VERSION } from './version'
 
@@ -6,7 +7,7 @@ export function Home({ onSample, onFile }: { onSample: (sample: SamplePlate) => 
     <main className="home">
       <div className="home-inner">
         <section className="hero">
-          <img src="/favicon.svg" alt="" />
+          <img src={publicUrl('favicon.svg')} alt="" />
           <div>
             <h1>HULLSCALE</h1>
             <p className="tag">PHOTO SCALE</p>

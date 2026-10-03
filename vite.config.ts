@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
+const siteBase = '/HullScale/'
 const staticPaths = ['samples', 'favicon.svg', 'icon-192.png', 'icon-512.png', 'og.jpg', 'manifest.webmanifest']
 
 const types: Record<string, string> = {
@@ -20,7 +21,8 @@ function repoStatic() {
     configureServer(server: { middlewares: { use: (fn: (req: { url?: string }, res: NodeJS.WritableStream & { setHeader: (k: string, v: string) => void; }, next: () => void) => void) => void } }) {
       server.middlewares.use((req, res, next) => {
         const url = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
-        const rel = url.replace(/^\//, '')
+        const withoutBase = url.startsWith(siteBase) ? url.slice(siteBase.length - 1) : url
+        const rel = withoutBase.replace(/^\//, '')
         if (!rel || rel.includes('..')) return next()
         const allowed = staticPaths.some((item) => rel === item || rel.startsWith(`${item}/`))
         if (!allowed) return next()
@@ -40,6 +42,7 @@ function repoStatic() {
 }
 
 export default defineConfig({
+  base: siteBase,
   plugins: [react(), repoStatic()],
   build: {
     outDir: 'dist',

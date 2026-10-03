@@ -1,3 +1,5 @@
+import { publicUrl } from './publicUrl'
+
 export type SamplePlate = {
   id: string
   name: string
@@ -13,7 +15,7 @@ export const SAMPLES: SamplePlate[] = [
   {
     id: 'calibration',
     name: 'Calibration',
-    src: '/samples/calibration.svg',
+    src: publicUrl('samples/calibration.svg'),
     blurb: 'Declared bars. Main field 4 px/m, near field 40 px/m.',
     hint: 'Lock one labelled bar, then check the rest against the legend.',
     tag: 'Scale',
@@ -23,7 +25,7 @@ export const SAMPLES: SamplePlate[] = [
   {
     id: 'qv',
     name: 'Queen Victoria',
-    src: '/samples/queen-victoria.svg',
+    src: publicUrl('samples/queen-victoria.svg'),
     blurb: 'Cunard liner, 294 m. 4 px per metre.',
     hint: 'Lock length 294 m. Beam should read 32.3 m.',
     tag: 'Cruise',
@@ -33,7 +35,7 @@ export const SAMPLES: SamplePlate[] = [
   {
     id: 'ocisly',
     name: 'Of Course I Still Love You',
-    src: '/samples/ocisly.svg',
+    src: publicUrl('samples/ocisly.svg'),
     blurb: 'SpaceX ASDS, 91 × 52 m. Falcon 9 on the pad.',
     hint: 'Lock barge length 91 m. Falcon 9 diameter should read 3.7 m.',
     tag: 'ASDS',
@@ -43,7 +45,7 @@ export const SAMPLES: SamplePlate[] = [
   {
     id: 'tug',
     name: 'Harbor tug',
-    src: '/samples/harbor-tug.svg',
+    src: publicUrl('samples/harbor-tug.svg'),
     blurb: 'Damen RSD 2513, 24.73 m. 24 px per metre.',
     hint: 'Lock length 24.73 m. Beam should read 13.13 m.',
     tag: 'Tug',
@@ -53,7 +55,7 @@ export const SAMPLES: SamplePlate[] = [
   {
     id: 'falcon9',
     name: 'Falcon 9',
-    src: '/samples/falcon-9.svg',
+    src: publicUrl('samples/falcon-9.svg'),
     blurb: 'Block 5 stack, 70 m. 12 px per metre.',
     hint: 'Lock height 70 m. Diameter should read 3.7 m. Use cylinder rails on the first stage.',
     tag: 'Rocket',
@@ -63,7 +65,7 @@ export const SAMPLES: SamplePlate[] = [
   {
     id: 'neopanamax',
     name: 'Neo-Panamax',
-    src: '/samples/neopanamax.svg',
+    src: publicUrl('samples/neopanamax.svg'),
     blurb: 'Canal-max boxship, 366 m. 4 px per metre.',
     hint: 'Lock length 366 m. An ISO 40ft box should read 12.192 m.',
     tag: 'Container',
@@ -73,7 +75,7 @@ export const SAMPLES: SamplePlate[] = [
   {
     id: 'elevation',
     name: 'Vanguard · starboard',
-    src: '/samples/vanguard-elevation.svg',
+    src: publicUrl('samples/vanguard-elevation.svg'),
     blurb: 'Ship on deck, 4 px per metre.',
     hint: 'Lock BOKA Vanguard length (275 m). Starship diameter should read 9 m.',
     tag: 'Heavy lift',
@@ -83,7 +85,7 @@ export const SAMPLES: SamplePlate[] = [
   {
     id: 'plan',
     name: 'Vanguard · plan',
-    src: '/samples/vanguard-plan.svg',
+    src: publicUrl('samples/vanguard-plan.svg'),
     blurb: 'Deck 275 × 70 m, overall beam 78.75 m.',
     hint: 'Lock deck beam (70 m). The hull outline is 78.75 m across.',
     tag: 'Heavy lift',
