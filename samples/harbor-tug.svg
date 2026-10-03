@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-label="Harbor tug RSD 2513 starboard elevation, 24 pixels per metre">
+  <rect width="1920" height="1080" fill="#141618"/>
+  <rect width="1920" height="720" fill="#171c20"/>
+  <rect y="720" width="1920" height="360" fill="#0e1316"/>
+  <line x1="0" y1="720" x2="1920" y2="720" stroke="#6aa0b8" stroke-width="1.5" opacity="0.7"/>
+  <!-- 24 px/m. LOA 24.73 m = 593.52. Beam 13.13 m = 315.12. Draft 6.50 m = 156. -->
+  <g transform="translate(663 0)">
+    <!-- hull -->
+    <path d="M20 720 L70 648 L520 656 L590 700 L593.5 720 L580 876 L80 876 L8 820 L20 720Z" fill="#1c2226" stroke="#7ec8c0" stroke-width="1.8"/>
+    <!-- fender -->
+    <path d="M24 720 L72 652 L516 660 L588 708" fill="none" stroke="#c4a46a" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
+    <!-- tire fenders -->
+    <g fill="#141618" stroke="#c4a46a" stroke-width="2">
+      <circle cx="120" cy="728" r="18"/>
+      <circle cx="200" cy="728" r="18"/>
+      <circle cx="280" cy="728" r="18"/>
+      <circle cx="360" cy="728" r="18"/>
+      <circle cx="440" cy="728" r="18"/>
+    </g>
+    <!-- house -->
+    <rect x="210" y="520" width="220" height="140" rx="4" fill="#2a3238" stroke="#7ec8c0" stroke-width="1.3"/>
+    <rect x="230" y="455" width="180" height="70" rx="3" fill="#323a40" stroke="#7ec8c0" stroke-width="1.2"/>
+    <rect x="255" y="410" width="130" height="48" rx="2" fill="#3a4248" stroke="#7ec8c0" stroke-width="1.1"/>
+    <rect x="270" y="428" width="100" height="18" fill="#7ec8c0" opacity="0.35"/>
+    <!-- funnel -->
+    <rect x="300" y="360" width="48" height="52" rx="2" fill="#c45c58"/>
+    <rect x="300" y="360" width="48" height="12" fill="#141618"/>
+    <!-- mast -->
+    <line x1="324" y1="360" x2="324" y2="300" stroke="#7ec8c0" stroke-width="2"/>
+    <!-- towing winch -->
+    <rect x="460" y="668" width="70" height="28" rx="3" fill="#24282c" stroke="#7ec8c0" stroke-width="1"/>
+    <!-- A length -->
+    <path d="M0 910 L0 930 L593.5 930 L593.5 910" fill="none" stroke="#7ec8c0" stroke-width="1.2"/>
+    <!-- B draft -->
+    <path d="M40 720 L22 720 L22 876 L40 876" fill="none" stroke="#7ec8c0" stroke-width="1.2"/>
+  </g>
+  <!-- beam station at plate scale 24 px/m: 13.13 m = 315.12, draft 6.50 m = 156 -->
+  <g transform="translate(80 180)">
+    <text x="0" y="0" fill="#8b949c" font-size="11" font-family="ui-sans-serif, system-ui, sans-serif" letter-spacing="0.16em">STATION  ·  C beam  24 px/m</text>
+    <rect x="0" y="16" width="315.12" height="120" fill="#1c2226" stroke="#7ec8c0" stroke-width="1.4"/>
+    <rect x="0" y="136" width="315.12" height="156" fill="#0e1316" stroke="#6aa0b8" stroke-width="1.2"/>
+    <path d="M0 310 L0 322 L315.12 322 L315.12 310" fill="none" stroke="#7ec8c0" stroke-width="1.2"/>
+  </g>
+  <!-- person 1.75 m = 42 px at 24 px/m -->
+  <g transform="translate(1280 678)" fill="#c9d2d6">
+    <circle cx="10" cy="8" r="8"/>
+    <rect x="5" y="16" width="10" height="18"/>
+    <rect x="3" y="34" width="5" height="8" fill="#8b949c"/>
+    <rect x="12" y="34" width="5" height="8" fill="#8b949c"/>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" fill="#8b949c">
+    <text x="80" y="64" font-size="13" letter-spacing="0.28em">HULLSCALE  ·  PLATE 06</text>
+    <text x="80" y="96" font-size="28" fill="#e8ecee">Harbor tug · RSD 2513</text>
+    <text x="80" y="128" font-size="14">Damen-class harbour tug. 24 pixels / metre. Lock A = 24.73 m, then C should read 13.13 m.</text>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#7ec8c0">
+    <text x="900" y="960">A  length</text>
+    <text x="620" y="800">B  draft</text>
+    <text x="220" y="350">C  beam</text>
+    <text x="1280" y="668">H  person</text>
+  </g>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#8b949c">
+    <text x="1480" y="64">A  24.73 m  length</text>
+    <text x="1480" y="84">B  6.50 m   draft</text>
+    <text x="1480" y="104">C  13.13 m  beam</text>
+    <text x="1480" y="124">H  1.75 m   person</text>
+  </g>
+</svg>

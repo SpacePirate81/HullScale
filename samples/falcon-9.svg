@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-label="Falcon 9 Block 5 stack, 12 pixels per metre">
+  <rect width="1920" height="1080" fill="#141618"/>
+  <rect width="1920" height="1000" fill="#171c20"/>
+  <rect y="1000" width="1920" height="80" fill="#1c2226"/>
+  <!-- 12 px/m. Height 70 m = 840. Diameter 3.7 m = 44.4. Fairing 5.2 × 13.1 m = 62.4 × 157.2. -->
+  <!-- Vehicle from y=140 to y=980. Center x=780 -->
+  <g transform="translate(780 140)">
+    <!-- fairing ogive -->
+    <path d="M-31.2 157.2 L-31.2 48 Q-31.2 0 0 0 Q31.2 0 31.2 48 L31.2 157.2Z" fill="#e8ecee" stroke="#7ec8c0" stroke-width="1.2"/>
+    <!-- second stage 3.7 m -->
+    <rect x="-22.2" y="157.2" width="44.4" height="110.4" fill="#c9d2d6" stroke="#7ec8c0" stroke-width="1"/>
+    <!-- interstage / black band at 47.7 m from bottom → from top: (70-47.7)*12 = 267.6 -->
+    <rect x="-22.2" y="267.6" width="44.4" height="28" fill="#24282c" stroke="#7ec8c0" stroke-width="1"/>
+    <!-- first stage -->
+    <rect x="-22.2" y="295.6" width="44.4" height="500" fill="#c9d2d6" stroke="#7ec8c0" stroke-width="1"/>
+    <!-- SpaceX mark -->
+    <rect x="-10" y="520" width="20" height="90" rx="2" fill="#7ec8c0" opacity="0.25"/>
+    <!-- grid fins ~40 m from bottom = 840-480=360 from top -->
+    <rect x="-52" y="348" width="28" height="10" fill="#8b949c"/>
+    <rect x="24" y="348" width="28" height="10" fill="#8b949c"/>
+    <!-- landing legs folded -->
+    <path d="M-22.2 780 L-70 830" stroke="#8b949c" stroke-width="3"/>
+    <path d="M22.2 780 L70 830" stroke="#8b949c" stroke-width="3"/>
+    <!-- octaweb / engines -->
+    <rect x="-24" y="796" width="48" height="20" fill="#24282c"/>
+    <g fill="#3a4248" stroke="#7ec8c0" stroke-width="0.8">
+      <ellipse cx="-12" cy="828" rx="7" ry="12"/>
+      <ellipse cx="0" cy="832" rx="8" ry="14"/>
+      <ellipse cx="12" cy="828" rx="7" ry="12"/>
+    </g>
+    <!-- A height 70 m -->
+    <path d="M90 0 L110 0 L110 840 L90 840" fill="none" stroke="#7ec8c0" stroke-width="1.2"/>
+    <!-- C diameter -->
+    <path d="M-22.2 640 L-22.2 660 L22.2 660 L22.2 640" fill="none" stroke="#7ec8c0" stroke-width="1"/>
+    <!-- D fairing diameter -->
+    <path d="M-31.2 80 L-50 80 L-50 60" fill="none" stroke="#7ec8c0" stroke-width="1"/>
+    <path d="M31.2 80 L50 80 L50 60" fill="none" stroke="#7ec8c0" stroke-width="1"/>
+    <!-- E first stage with interstage 47.7 m = 572.4 from bottom → y=840-572.4=267.6 -->
+    <path d="M-80 267.6 L-96 267.6 L-96 840 L-80 840" fill="none" stroke="#7ec8c0" stroke-width="1" opacity="0.7"/>
+  </g>
+  <!-- fairing callout box -->
+  <g transform="translate(1100 200)" font-family="ui-sans-serif, system-ui, sans-serif" fill="#8b949c">
+    <rect width="420" height="200" fill="#1c1f22" stroke="#7ec8c0" stroke-width="1"/>
+    <text x="20" y="32" font-size="12" letter-spacing="0.16em">FAIRING</text>
+    <text x="20" y="64" font-size="14" fill="#e8ecee">D  5.2 m diameter</text>
+    <text x="20" y="88" font-size="14" fill="#e8ecee">F  13.1 m height</text>
+    <text x="20" y="128" font-size="13">Lock A = 70 m. Diameter C should read 3.7 m.</text>
+    <text x="20" y="168" font-size="13">First stage with interstage is 47.7 m.</text>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" fill="#8b949c">
+    <text x="80" y="64" font-size="13" letter-spacing="0.28em">HULLSCALE  ·  PLATE 07</text>
+    <text x="80" y="96" font-size="28" fill="#e8ecee">Falcon 9 · Block 5</text>
+    <text x="80" y="128" font-size="14">12 pixels / metre. Stack on the pad. Cylinder, not a cone — use the rails tool on the first stage.</text>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#7ec8c0">
+    <text x="910" y="520">A  height</text>
+    <text x="720" y="820">C  diameter</text>
+    <text x="640" y="430">E  first stage</text>
+  </g>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#8b949c">
+    <text x="80" y="980">A  70 m     stack height</text>
+    <text x="80" y="1000">C  3.7 m    diameter</text>
+    <text x="80" y="1020">D  5.2 m    fairing diameter</text>
+    <text x="80" y="1040">E  47.7 m   first stage + interstage</text>
+    <text x="80" y="1060">F  13.1 m   fairing height</text>
+  </g>
+</svg>

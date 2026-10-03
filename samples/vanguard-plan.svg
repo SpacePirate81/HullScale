@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-label="BOKA Vanguard plan view, 4 pixels per metre">
+  <rect width="1920" height="1080" fill="#141618"/>
+  <rect x="80" y="80" width="1760" height="920" fill="#12161a"/>
+  <!-- water around -->
+  <rect x="80" y="80" width="1760" height="920" fill="#0e1316"/>
+  <!-- overall outline 275 × 78.75 m = 1100 × 315, centered -->
+  <rect x="410" y="382.5" width="1100" height="315" rx="8" fill="#1a2024" stroke="#6aa0b8" stroke-width="1.4"/>
+  <!-- deck 275 × 70 m = 1100 × 280 -->
+  <rect x="410" y="400" width="1100" height="280" fill="#1c2226" stroke="#7ec8c0" stroke-width="1.8"/>
+  <!-- starboard casing -->
+  <rect x="1260" y="400" width="250" height="56" fill="#242a2e" stroke="#7ec8c0" stroke-width="1"/>
+  <!-- grid 25 m -->
+  <g stroke="#7ec8c0" stroke-width="1" opacity="0.16">
+    <line x1="510" y1="400" x2="510" y2="680"/>
+    <line x1="610" y1="400" x2="610" y2="680"/>
+    <line x1="710" y1="400" x2="710" y2="680"/>
+    <line x1="810" y1="400" x2="810" y2="680"/>
+    <line x1="910" y1="400" x2="910" y2="680"/>
+    <line x1="1010" y1="400" x2="1010" y2="680"/>
+    <line x1="1110" y1="400" x2="1110" y2="680"/>
+    <line x1="1210" y1="400" x2="1210" y2="680"/>
+    <line x1="1310" y1="400" x2="1310" y2="680"/>
+    <line x1="1410" y1="400" x2="1410" y2="680"/>
+  </g>
+  <!-- Starship 50.3 × 9 m = 201.2 × 36, along centerline -->
+  <g transform="translate(560 522)">
+    <rect x="18" y="0" width="165.2" height="36" fill="#c9d2d6"/>
+    <circle cx="18" cy="18" r="18" fill="#c9d2d6"/>
+    <polygon points="183.2,0 201.2,18 183.2,36" fill="#d7e0e4"/>
+  </g>
+  <!-- ISO 40ft boxes 12.192 × 2.438 m = 48.77 × 9.75, a short row -->
+  <g fill="#2c3338" stroke="#7ec8c0" stroke-width="0.8">
+    <rect x="820" y="620" width="48.77" height="9.75"/>
+    <rect x="872" y="620" width="48.77" height="9.75"/>
+    <rect x="924" y="620" width="48.77" height="9.75"/>
+    <rect x="976" y="620" width="48.77" height="9.75"/>
+  </g>
+  <g fill="none" stroke="#7ec8c0" stroke-width="1" opacity="0.75">
+    <path d="M410 360 L410 340 L1510 340 L1510 360"/>
+    <path d="M390 400 L370 400 L370 680 L390 680"/>
+    <path d="M1540 382.5 L1560 382.5 L1560 697.5 L1540 697.5"/>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#7ec8c0">
+    <text x="900" y="328">A  length</text>
+    <text x="250" y="548">B  deck beam</text>
+    <text x="1574" y="548">C  overall beam</text>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" fill="#8b949c">
+    <text x="120" y="130" font-size="13" letter-spacing="0.28em">HULLSCALE  ·  PLATE 02</text>
+    <text x="120" y="164" font-size="28" fill="#e8ecee">Vanguard · plan</text>
+    <text x="120" y="196" font-size="14">4 pixels / metre · lock B = 70 m, C should read 78.75 m</text>
+  </g>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#8b949c">
+    <text x="1480" y="130">A  275 m     length</text>
+    <text x="1480" y="150">B  70 m      deck beam</text>
+    <text x="1480" y="170">C  78.75 m   overall beam</text>
+    <text x="1480" y="190">D  9 m       Starship Ø</text>
+    <text x="1480" y="210">E  12.192 m  ISO 40ft</text>
+  </g>
+</svg>

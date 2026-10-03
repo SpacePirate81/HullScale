@@ -1,0 +1,30 @@
+{
+  "name": "Hullscale",
+  "short_name": "Hullscale",
+  "description": "Lock a known length on a photograph and read every other distance, projected area, and lower-bound volume.",
+  "id": "/hullscale-0.9.4",
+  "start_url": "/?v=0.9.4",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1C1B19",
+  "theme_color": "#1C1B19",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/__grok/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
