@@ -22,7 +22,7 @@ You open a photograph or a to-scale plate. Until you lock a known length, every 
 
 **Area.** You draw a closed outline on one face of a structure and tag it front, side, or top. The pixel area is the usual polygon area (the "shoelace" sum). Square metres are that pixel area times the scale at the outline's centre, squared. The app calls this projected area: the face as it appears in the photo, not the true surface of a turned hull.
 
-**Lower-bound prism volume.** For one structure, the app looks at the front, side, and top outlines. It takes the width and height of the box around each outline, converts those with the local scale, and treats them as the three directions of a rectangular box. When two faces supply the same direction, it keeps the smaller number. It needs at least two faces, and all three directions, before it shows a volume. The number is width times height times depth. The on-screen note says this is the box those faces support, not the true hull volume.
+**Upper-bound box volume.** For one structure, the app looks at the front, side, and top outlines. It takes the width and height of the box around each outline, converts those with the local scale, and treats them as the three directions of a rectangular box. When two faces supply the same direction, it keeps the smaller number. It needs at least two faces, and all three directions, before it shows a volume. The number is width times height times depth. That box contains the outlines, so it is an upper bound on the object, not an inscribed lower bound. On a top view the user can say whether length runs left-right or up-down; otherwise the engine matches those axes to the front and side faces.
 
 **Starship stays a cylinder, not a cone.** The cylinder tool is two rails along a body, such as a rocket stage. You can assign a known diameter. The app then walks along the rails and, at each short step, converts pixels to metres with that known diameter and the local pixel width. A taper on the photo is treated as perspective (the body is still the same diameter), and the length comes out of that walk. The volume that belongs to this model is the cylinder volume, pi times radius squared times that length. A cone would use one third of that, and the app does not. The cylinder volume is calculated in the bundle and is not shown on screen; only the length is.
 
@@ -141,7 +141,7 @@ Prism, already in v0.9.4. Width, height, and depth come from the boxes around th
 prism volume = width × height × depth
 ```
 
-One line: this is the rectangular box the drawn faces support, and it is a lower bound on a fuller hull only in that sense.
+One line: this is the rectangular box around the drawn faces, and it is an upper bound on the object when those outlines are the full silhouette.
 
 Cylinder, already calculated, not shown. Diameter D is the diameter you assigned. Length is the sum of the rail steps described in section 1.
 

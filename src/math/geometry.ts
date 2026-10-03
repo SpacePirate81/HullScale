@@ -53,9 +53,21 @@ export function boundingBox(points: Point[]): { w: number; h: number } {
   return { w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) }
 }
 
+export function finitePoint(point: Point): boolean {
+  return Number.isFinite(point.x) && Number.isFinite(point.y)
+}
+
+/**
+ * Signed perpendicular distance from a point to the infinite line through a and b.
+ * The sign flips when a and b are swapped. Zero when the point is on the line.
+ */
+export function signedLineDistance(point: Point, a: Point, b: Point): number {
+  const len = distance(a, b)
+  if (!(len > 1e-9)) return distance(point, a)
+  return ((point.x - a.x) * (b.y - a.y) - (point.y - a.y) * (b.x - a.x)) / len
+}
+
 /** Perpendicular distance from a point to the infinite line through a and b. */
 export function lineDistance(point: Point, a: Point, b: Point): number {
-  const len = distance(a, b)
-  if (len < 1e-9) return distance(point, a)
-  return Math.abs((point.x - a.x) * (b.y - a.y) - (point.y - a.y) * (b.x - a.x)) / len
+  return Math.abs(signedLineDistance(point, a, b))
 }

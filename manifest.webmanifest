@@ -1,7 +1,7 @@
 {
   "name": "Hullscale",
   "short_name": "Hullscale",
-  "description": "Lock a known length on a photograph and read every other distance, projected area, and lower-bound volume.",
+  "description": "Lock a known length on a photograph and read every other distance, projected area, and an upper-bound box around the drawn faces.",
   "id": "/HullScale/",
   "start_url": "/HullScale/",
   "scope": "/HullScale/",

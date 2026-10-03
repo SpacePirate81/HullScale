@@ -1,4 +1,5 @@
 import {
+  alignRail,
   cylinderMeasure,
   DECISIONS,
   distance,
@@ -11,9 +12,11 @@ import {
   metresPerPixel,
   midpoint,
   photoLength,
+  photoLengthIssue,
   pixelsPerMetre,
   prismVolume,
   projectedArea,
+  referenceAnchor,
   scaleAt,
   scaleDisagreements,
   trueArea,
@@ -78,25 +81,27 @@ function letter(index: number): string {
 }
 
 function cylinderMiddle(ann: CylinderAnn): { at: Point; widthPx: number } {
+  const railB = alignRail(ann.railA, ann.railB)
   const t = 0.5
   const left = {
     x: ann.railA[0].x + (ann.railA[1].x - ann.railA[0].x) * t,
     y: ann.railA[0].y + (ann.railA[1].y - ann.railA[0].y) * t,
   }
   const right = {
-    x: ann.railB[0].x + (ann.railB[1].x - ann.railB[0].x) * t,
-    y: ann.railB[0].y + (ann.railB[1].y - ann.railB[0].y) * t,
+    x: railB[0].x + (railB[1].x - railB[0].x) * t,
+    y: railB[0].y + (railB[1].y - railB[0].y) * t,
   }
   return { at: midpoint(left, right), widthPx: distance(left, right) }
 }
 
 export function collectRefs(doc: PlateDoc): ScaleRef[] {
+  const horizon = horizonOf(doc)
   const refs: ScaleRef[] = []
   for (const ann of doc.annotations) {
-    if (ann.kind === 'measure' && ann.knownMetres != null && ann.knownMetres > 0) {
+    if (ann.kind === 'measure' && ann.knownMetres != null && Number.isFinite(ann.knownMetres) && ann.knownMetres > 0) {
       const px = distance(ann.a, ann.b)
       const mpp = metresPerPixel(ann.knownMetres, px)
-      if (mpp != null) refs.push({ id: ann.id, at: midpoint(ann.a, ann.b), metresPerPx: mpp })
+      if (mpp != null) refs.push({ id: ann.id, at: referenceAnchor(ann.a, ann.b, horizon), metresPerPx: mpp })
     }
     if (ann.kind === 'cylinder' && ann.knownDiameterMetres != null && ann.knownDiameterMetres > 0) {
       const mid = cylinderMiddle(ann)
@@ -148,18 +153,21 @@ export function buildReport(doc: PlateDoc, unit: LengthUnit): Report {
       measures.push(measureRow(ann, doc.clickClass, refs, horizon, refMeasure, names.get(ann.id) ?? '?', unit))
     }
     if (ann.kind === 'cylinder') {
-      const body = cylinderMeasure(ann.railA, ann.railB, ann.knownDiameterMetres ?? null, refs, horizon)
+      const diameter = ann.knownDiameterMetres
+      const lockedDiameter = diameter != null && Number.isFinite(diameter) && diameter > 0
+      const body = cylinderMeasure(ann.railA, ann.railB, lockedDiameter ? diameter : null, refs, horizon)
       const mark = names.get(ann.id) ?? '?'
       const lengthText = body.lengthM == null ? 'pixels until a diameter or a length is locked' : formatLengthPair(body.lengthM, unit)
       const volumeText =
         DECISIONS.showCylinderVolume && body.volumeM3 != null ? formatVolume(body.volumeM3, unit) : null
+      const diameterNote = lockedDiameter
+        ? 'Cylinder of the locked diameter. A taper on the photo is perspective, not a cone.'
+        : 'Lock a diameter to read length and cylinder volume.'
       cylinders.push({
         id: ann.id,
         name: `${mark}  ${ann.label?.trim() || 'Cylinder'}`,
         text: volumeText == null ? lengthText : `${lengthText}   ·   volume ${volumeText}`,
-        note: ann.knownDiameterMetres
-          ? 'Cylinder of the locked diameter. A taper on the photo is perspective, not a cone.'
-          : 'Lock a diameter to read length and cylinder volume.',
+        note: body.warning ? `${diameterNote} ${body.warning}` : diameterNote,
       })
     }
   }
@@ -175,22 +183,45 @@ export function buildReport(doc: PlateDoc, unit: LengthUnit): Report {
       (ann): ann is AreaAnn => ann.kind === 'area' && ann.structureId === structure.id && ann.points.length >= 3,
     )
     const prism = prismVolume(
-      faces.map((face) => ({ facing: face.facing, points: face.points })),
+      faces.map((face) => ({
+        facing: face.facing,
+        points: face.points,
+        lengthAxis: face.facing === 'top' ? (face.lengthAxis ?? null) : null,
+      })),
       refs,
       horizon,
     )
     return {
       id: structure.id,
       name: structure.name,
-      text: prism.volumeM3 == null ? null : `${formatVolume(prism.volumeM3, unit)} lower bound`,
+      text: prism.volumeM3 == null ? null : `${formatVolume(prism.volumeM3, unit)} upper bound`,
       note: prism.note,
     }
   })
 
+  const flags = scaleDisagreements(refs, horizon)
+  if (
+    doc.annotations.some(
+      (ann) => ann.kind === 'measure' && ann.knownMetres != null && !(Number.isFinite(ann.knownMetres) && ann.knownMetres > 0),
+    )
+  ) {
+    flags.push('A locked length is zero or not a real number, so it was ignored.')
+  }
+  if (
+    doc.annotations.some(
+      (ann) =>
+        ann.kind === 'cylinder' &&
+        ann.knownDiameterMetres != null &&
+        !(Number.isFinite(ann.knownDiameterMetres) && ann.knownDiameterMetres > 0),
+    )
+  ) {
+    flags.push('A locked diameter is zero or not a real number, so it was ignored.')
+  }
+
   return {
     locked,
     pxPerM: flat == null ? null : pixelsPerMetre(flat),
-    flags: scaleDisagreements(refs),
+    flags,
     horizon: horizon != null,
     measures,
     areas,
@@ -209,6 +240,23 @@ function measureRow(
   unit: LengthUnit,
 ): MeasureRow {
   const px = distance(ann.a, ann.b)
+  const label = ann.label?.trim() || (ann.role === 'reference' ? 'Reference' : 'Measure')
+  const issue = photoLengthIssue(ann.a, ann.b, refs, horizon)
+  if (issue) {
+    return {
+      id: ann.id,
+      mark,
+      label,
+      px,
+      metres: null,
+      pair: null,
+      primary: Number.isFinite(px) ? `${Math.round(px)} px` : '— px',
+      warning: issue,
+      barText: null,
+      tone: 'red',
+      notes: [issue],
+    }
+  }
   const photo = photoLength(ann.a, ann.b, refs, horizon)
   const angled = photo == null ? null : lengthOutOfPlane(photo, ann.angleDeg)
   const metres = angled?.metres ?? null
@@ -232,7 +280,6 @@ function measureRow(
           angleUncertaintyDeg: ann.angleUncertaintyDeg,
           plane: ann.plane ?? null,
         })
-  const label = ann.label?.trim() || (ann.role === 'reference' ? 'Reference' : 'Measure')
   return {
     id: ann.id,
     mark,
@@ -254,13 +301,14 @@ function measureRow(
 function areaRow(ann: AreaAnn, refs: ScaleRef[], horizon: Horizon | null, mark: string, unit: LengthUnit): AreaRow {
   const projected = projectedArea(ann.points, refs, horizon)
   const turned = projected == null ? null : trueArea(projected, ann.turnDeg)
+  const metres2 = turned?.metres2 ?? null
   return {
     id: ann.id,
     mark,
     facing: ann.facing,
     structureId: ann.structureId,
-    metres2: turned?.metres2 ?? null,
-    primary: turned == null ? `${Math.round(ann.points.length)} pts` : formatArea(turned.metres2, unit),
+    metres2,
+    primary: metres2 == null ? `${Math.round(ann.points.length)} pts` : formatArea(metres2, unit),
     warning: turned?.warning ?? (projected == null ? 'Lock a length before area is in metres.' : null),
   }
 }
@@ -272,10 +320,12 @@ export function reportText(doc: PlateDoc, unit: LengthUnit): string {
     'Measured from a photo — not a manufacturer figure',
     report.locked ? 'Scale locked' : 'No length locked (pixels only)',
     report.horizon ? 'Horizon is steering the scale' : 'No horizon — scale is flat across the plate',
+    ...report.flags,
     '',
   ]
   for (const row of report.measures) {
     lines.push(`${row.mark}  ${row.label}  ${row.pair ?? row.primary}${row.barText ? `  ${row.barText}` : ''}`)
+    if (row.warning && !/^Angle not set\./i.test(row.warning)) lines.push(`  ${row.warning}`)
   }
   for (const row of report.cylinders) lines.push(`${row.name}  ${row.text ?? ''}`, `  ${row.note}`)
   for (const row of report.areas) lines.push(`${row.mark}  ${row.facing}  projected ${row.primary}`)

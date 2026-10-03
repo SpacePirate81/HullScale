@@ -59,6 +59,15 @@ export type ErrorBarInput = {
 }
 
 export function errorBar(input: ErrorBarInput): ErrorBar {
+  if (!Number.isFinite(input.lengthPx) || !(input.lengthPx > 0)) {
+    return {
+      rel: 0,
+      sigmaM: null,
+      terms: [],
+      warnings: [{ level: 'red', text: 'Line length is zero, so the uncertainty cannot be calculated.' }],
+      tone: 'red',
+    }
+  }
   const clickClass = input.clickClass ?? 'finger'
   const s1 = clickDoubtPx(clickClass, input.edgeA, input.customClickPx)
   const s2 = clickDoubtPx(clickClass, input.edgeB, input.customClickPx)
@@ -75,10 +84,12 @@ export function errorBar(input: ErrorBarInput): ErrorBar {
 
   const known = input.knownMetres
   const tol = input.toleranceMetres ?? 0
-  const refLengthRel = known != null && known > 0 ? Math.max(0, tol) / known : 0
+  const refLengthRel =
+    known != null && Number.isFinite(known) && known > 0 ? Math.max(0, Number.isFinite(tol) ? tol : 0) / known : 0
   const turn = angleShare(input.angleDeg, input.angleUncertaintyDeg)
-  const bias = (input.biases ?? []).reduce((sum, item) => sum + Math.abs(item.rel), 0)
-  const rel = hypot(clickRel, refClickRel, refLengthRel, turn) + bias
+  const bias = (input.biases ?? []).reduce((sum, item) => sum + (Number.isFinite(item.rel) ? Math.abs(item.rel) : 0), 0)
+  const combined = hypot(clickRel, refClickRel, refLengthRel, turn) + bias
+  const rel = Number.isFinite(combined) ? combined : Number.NaN
 
   const terms: BarTerm[] = [
     { id: 'click', rel: clickRel },
@@ -89,7 +100,11 @@ export function errorBar(input: ErrorBarInput): ErrorBar {
   if (bias > 0) terms.push({ id: 'bias', rel: bias })
 
   const warnings: BarWarning[] = []
-  if ((input.toleranceMetres ?? 0) <= 0 && known != null) {
+  const metresOk = input.metres != null && Number.isFinite(input.metres)
+  if (input.metres != null && !metresOk) {
+    warnings.push({ level: 'red', text: 'The reading is not a real number.' })
+  }
+  if ((input.toleranceMetres ?? 0) <= 0 && known != null && Number.isFinite(known)) {
     warnings.push({ level: 'note', text: 'reference tolerance not set' })
   }
   if (input.lengthPx < 150 || (input.refPx != null && input.refPx < 150)) {
@@ -108,15 +123,17 @@ export function errorBar(input: ErrorBarInput): ErrorBar {
     warnings.push({ level: 'note', text: 'Angle not set. Length is uncorrected.' })
   }
   warnings.push({ level: 'note', text: 'Lens distortion is not included.' })
-  if (rel > 0.07) warnings.push({ level: 'red', text: 'uncertainty above 7%' })
-  else if (rel > 0.05) warnings.push({ level: 'amber', text: 'uncertainty above 5%' })
+  const safeRel = Number.isFinite(rel) ? rel : 0
+  if (!Number.isFinite(rel)) warnings.push({ level: 'red', text: 'The uncertainty is not a real number.' })
+  else if (safeRel > 0.07) warnings.push({ level: 'red', text: 'uncertainty above 7%' })
+  else if (safeRel > 0.05) warnings.push({ level: 'amber', text: 'uncertainty above 5%' })
 
   const tone: BarTone =
-    rel > 0.07 ? 'red' : input.plane === 'off' || rel > 0.05 || warnings.some((w) => w.level === 'amber') ? 'amber' : 'ok'
+    safeRel > 0.07 ? 'red' : input.plane === 'off' || safeRel > 0.05 || warnings.some((w) => w.level === 'amber') ? 'amber' : 'ok'
 
   return {
-    rel,
-    sigmaM: input.metres == null ? null : Math.abs(input.metres) * rel,
+    rel: safeRel,
+    sigmaM: metresOk ? Math.abs(input.metres as number) * safeRel : null,
     terms,
     warnings,
     tone,

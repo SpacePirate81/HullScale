@@ -3,10 +3,12 @@ export {
   boundingBox,
   centroid,
   distance,
+  finitePoint,
   lerp,
   lineDistance,
   midpoint,
   shoelace,
+  signedLineDistance,
   type Point,
 } from './geometry'
 export { libraryById, libraryGroups, REFERENCE_LIBRARY, type LibraryEntry, type LibraryKind } from './library'
@@ -35,9 +37,11 @@ export {
 } from './units'
 export {
   averageMetresPerPx,
+  horizonGroundDistance,
   integrateLength,
   metresPerPixel,
   pixelsPerMetre,
+  referenceAnchor,
   SCALE_DISAGREE,
   scaleAt,
   scaleDisagreements,
@@ -50,11 +54,15 @@ export {
   lengthOutOfPlane,
   lengthVertical,
   photoLength,
+  photoLengthIssue,
+  PLANE_ANGLE_LIMIT_DEG,
   riseAndRun,
+  STEEP_PLANE_ANGLE_DEG,
   type LengthResult,
 } from './length'
 export { pixelArea, projectedArea, trueArea } from './area'
 export {
+  alignRail,
   coneVolume,
   cylinderMeasure,
   cylinderVolume,
@@ -65,6 +73,7 @@ export {
   type FaceInput,
   type PrismResult,
   type Rail,
+  type TopLengthAxis,
 } from './volume'
 export {
   CLICK_PX,
