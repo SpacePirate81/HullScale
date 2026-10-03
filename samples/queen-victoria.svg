@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-label="MS Queen Victoria starboard elevation, 4 pixels per metre">
+  <rect width="1920" height="1080" fill="#141618"/>
+  <rect width="1920" height="700" fill="#171c20"/>
+  <rect y="700" width="1920" height="380" fill="#0e1316"/>
+  <line x1="0" y1="700" x2="1920" y2="700" stroke="#6aa0b8" stroke-width="1.5" opacity="0.7"/>
+  <!-- 4 px/m. LOA 294 m = 1176 px, x=372. Draft 8 m = 32. Keel-to-funnel 62.5 m = 250. -->
+  <g transform="translate(120 0)">
+    <!-- hull: keel 732, waterline 700, sheer ~12 m = 48 px above WL -->
+    <path d="M40 700 L80 668 L1080 656 L1140 668 L1176 690 L1176 724 L1148 732 L80 732 L24 718 L40 700Z" fill="#1c2226" stroke="#7ec8c0" stroke-width="1.6"/>
+    <!-- boot stripe -->
+    <path d="M40 700 L80 668 L1080 656 L1140 668 L1176 690" fill="none" stroke="#7ec8c0" stroke-width="2" opacity="0.35"/>
+    <!-- superstructure decks -->
+    <rect x="220" y="600" width="720" height="56" rx="2" fill="#2a3238" stroke="#7ec8c0" stroke-width="1.1"/>
+    <rect x="260" y="556" width="640" height="44" rx="2" fill="#323a40" stroke="#7ec8c0" stroke-width="1"/>
+    <rect x="300" y="518" width="420" height="38" rx="2" fill="#3a4248" stroke="#7ec8c0" stroke-width="1"/>
+    <!-- bridge -->
+    <rect x="720" y="500" width="110" height="56" fill="#323a40" stroke="#7ec8c0" stroke-width="1.1"/>
+    <!-- bridge wings extreme beam callout lives on the small station -->
+    <rect x="700" y="512" width="150" height="8" fill="#7ec8c0" opacity="0.35"/>
+    <!-- funnel  — Cunard red from the destructive token -->
+    <rect x="430" y="450" width="54" height="70" rx="2" fill="#c45c58"/>
+    <rect x="430" y="450" width="54" height="16" fill="#141618"/>
+    <!-- windows -->
+    <g fill="#7ec8c0" opacity="0.45">
+      <rect x="240" y="612" width="680" height="6"/>
+      <rect x="280" y="568" width="600" height="5"/>
+      <rect x="320" y="528" width="380" height="5"/>
+    </g>
+    <!-- A length -->
+    <path d="M0 760 L0 780 L1176 780 L1176 760" fill="none" stroke="#7ec8c0" stroke-width="1" opacity="0.75"/>
+    <!-- B draft -->
+    <path d="M30 700 L12 700 L12 732 L30 732" fill="none" stroke="#7ec8c0" stroke-width="1" opacity="0.75"/>
+    <!-- C keel to funnel -->
+    <path d="M500 450 L520 450 L520 732 L500 732" fill="none" stroke="#7ec8c0" stroke-width="1" opacity="0.55"/>
+  </g>
+  <!-- amidships station: beam 32.3 m = 129.2, extreme 36.6 m = 146.4, draft 32 -->
+  <g transform="translate(1580 560)">
+    <rect x="8.6" y="0" width="129.2" height="80" fill="#1c2226" stroke="#7ec8c0" stroke-width="1.3"/>
+    <line x1="0" y1="40" x2="146.4" y2="40" stroke="#7ec8c0" stroke-width="1.4"/>
+    <line x1="0" y1="40" x2="0" y2="48" stroke="#7ec8c0" stroke-width="1"/>
+    <line x1="146.4" y1="40" x2="146.4" y2="48" stroke="#7ec8c0" stroke-width="1"/>
+    <rect x="8.6" y="80" width="129.2" height="32" fill="#0e1316" stroke="#6aa0b8" stroke-width="1"/>
+    <text x="0" y="-12" fill="#7ec8c0" font-size="13" font-family="ui-sans-serif, system-ui, sans-serif">D  beam   E  wings</text>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" fill="#8b949c">
+    <text x="80" y="64" font-size="13" letter-spacing="0.28em">HULLSCALE  ·  PLATE 04</text>
+    <text x="80" y="96" font-size="28" fill="#e8ecee">Queen Victoria · starboard</text>
+    <text x="80" y="128" font-size="14">Cunard Vista-class. 4 pixels / metre. Lock A = 294 m, then D should read 32.3 m.</text>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#7ec8c0">
+    <text x="900" y="810">A  length</text>
+    <text x="160" y="720">B  draft</text>
+    <text x="560" y="440">C  keel–funnel</text>
+  </g>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#8b949c">
+    <text x="1480" y="64">A  294 m    length</text>
+    <text x="1480" y="84">B  8.0 m    draft</text>
+    <text x="1480" y="104">C  62.5 m   keel to funnel</text>
+    <text x="1480" y="124">D  32.3 m   beam</text>
+    <text x="1480" y="144">E  36.6 m   extreme beam</text>
+  </g>
+</svg>

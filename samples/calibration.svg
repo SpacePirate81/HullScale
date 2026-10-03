@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-label="Hullscale calibration plate with declared length bars">
+  <rect width="1920" height="1080" fill="#141618"/>
+  <rect x="48" y="48" width="1824" height="984" fill="none" stroke="#7ec8c0" stroke-width="1" opacity="0.35"/>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" fill="#8b949c">
+    <text x="80" y="100" font-size="13" letter-spacing="0.28em">HULLSCALE  ·  PLATE 03</text>
+    <text x="80" y="136" font-size="28" fill="#e8ecee">Calibration plate</text>
+    <text x="80" y="166" font-size="14">Main field 4 px / m · near field 40 px / m. Measure a bar, assign the library length, then check the rest.</text>
+  </g>
+  <!-- A 275 m = 1100 px -->
+  <g transform="translate(80 210)">
+    <rect width="1100" height="14" fill="#7ec8c0"/>
+    <text x="0" y="-10" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">A</text>
+  </g>
+  <!-- B 70 m = 280 px -->
+  <g transform="translate(80 280)">
+    <rect width="280" height="14" fill="#7ec8c0"/>
+    <text x="0" y="-10" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">B</text>
+  </g>
+  <!-- C 78.75 m = 315 px -->
+  <g transform="translate(80 350)">
+    <rect width="315" height="14" fill="#7ec8c0"/>
+    <text x="0" y="-10" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">C</text>
+  </g>
+  <!-- D 15.5 m = 62 px vertical -->
+  <g transform="translate(80 400)">
+    <rect width="14" height="62" fill="#7ec8c0"/>
+    <text x="24" y="14" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">D</text>
+  </g>
+  <!-- E 9 m diameter = 36 px circle -->
+  <g transform="translate(200 470)">
+    <circle cx="18" cy="18" r="18" fill="none" stroke="#7ec8c0" stroke-width="3"/>
+    <text x="48" y="22" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">E</text>
+  </g>
+  <!-- F 50.3 m = 201.2 px -->
+  <g transform="translate(80 560)">
+    <rect width="201.2" height="14" fill="#c9d2d6"/>
+    <text x="0" y="-10" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">F</text>
+  </g>
+  <!-- Near field inset 40 px/m -->
+  <g transform="translate(1280 210)">
+    <rect x="-24" y="-48" width="560" height="520" fill="#1c1f22" stroke="#7ec8c0" stroke-width="1" opacity="1"/>
+    <text x="0" y="-20" fill="#8b949c" font-size="12" font-family="ui-sans-serif, system-ui, sans-serif" letter-spacing="0.16em">NEAR FIELD  ·  40 px / m</text>
+    <!-- G ISO 20ft 6.058 × 2.438 m = 242.3 × 97.5 -->
+    <rect x="0" y="16" width="242.32" height="97.52" fill="#2c3338" stroke="#7ec8c0" stroke-width="1.4"/>
+    <text x="0" y="8" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">G</text>
+    <!-- H person 1.75 m = 70 px -->
+    <g transform="translate(0 160)">
+      <text x="0" y="-8" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">H</text>
+      <circle cx="16" cy="10" r="8" fill="#c9d2d6"/>
+      <rect x="10" y="20" width="12" height="32" fill="#c9d2d6"/>
+      <rect x="8" y="52" width="6" height="18" fill="#8b949c"/>
+      <rect x="18" y="52" width="6" height="18" fill="#8b949c"/>
+    </g>
+    <!-- I car 4.5 m = 180 px, ~1.5 m high = 60 px -->
+    <g transform="translate(80 160)">
+      <text x="0" y="-8" fill="#7ec8c0" font-size="14" font-family="ui-sans-serif, system-ui, sans-serif">I</text>
+      <rect x="0" y="20" width="180" height="50" rx="8" fill="#2c3338" stroke="#7ec8c0" stroke-width="1.4"/>
+      <rect x="36" y="6" width="80" height="22" rx="4" fill="#24282c" stroke="#7ec8c0" stroke-width="1"/>
+      <circle cx="36" cy="72" r="12" fill="#1c1f22" stroke="#7ec8c0" stroke-width="1.4"/>
+      <circle cx="144" cy="72" r="12" fill="#1c1f22" stroke="#7ec8c0" stroke-width="1.4"/>
+    </g>
+  </g>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#8b949c">
+    <text x="80" y="680">DECLARED LENGTHS</text>
+    <text x="80" y="708" fill="#e8ecee">A  BOKA Vanguard length          275 m</text>
+    <text x="80" y="730">B  BOKA Vanguard deck beam        70 m</text>
+    <text x="80" y="752">C  BOKA Vanguard overall beam   78.75 m</text>
+    <text x="80" y="774">D  BOKA Vanguard depth            15.5 m</text>
+    <text x="80" y="796">E  Starship diameter                 9 m</text>
+    <text x="80" y="818">F  Starship (Ship) length         50.3 m</text>
+    <text x="80" y="850">G  ISO 20ft length               6.058 m</text>
+    <text x="80" y="872">H  Person                         1.75 m</text>
+    <text x="80" y="894">I  Car length                      4.5 m</text>
+    <text x="80" y="940" fill="#6a737a">Pixels stay pixels until a length is locked. Then every other bar converts.</text>
+  </g>
+</svg>
