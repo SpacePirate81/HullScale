@@ -1,0 +1,4 @@
+/** Path on this site, including the GitHub Pages project prefix. */
+export function publicUrl(path: string): string {
+  return import.meta.env.BASE_URL + path.replace(/^\/+/, '')
+}
