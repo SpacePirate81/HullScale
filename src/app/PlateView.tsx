@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from 'react'
 import { distance, type Point } from '../math'
 import { Loupe } from './Loupe'
+import { inkStroke, type InkId } from './palette'
 import type { Annotation, FaceFacing, PlateDoc, Tool } from './types'
 import { newId } from './types'
 import { clientToImage, clientToImageBox, plateImageStyle, type View } from './viewGeometry'
@@ -8,9 +9,6 @@ type LineDraft = { kind: 'reference' | 'measure' | 'horizon' | 'waterline'; a: P
 type CylinderDraft = { points: Point[]; cursor: Point | null }
 type AreaDraft = { points: Point[]; cursor: Point | null; facing: FaceFacing }
 
-const INK = '#7ec8c0'
-const BRASS = '#c4a574'
-const LOCK = '#ff4f00'
 
 function fit(vw: number, vh: number, iw: number, ih: number): View {
   const scale = Math.min(vw / iw, vh / ih) * 0.96
@@ -23,6 +21,7 @@ export function PlateView({
   loupeOn,
   loupeZoom,
   facing,
+  ink,
   onCommit,
 }: {
   doc: PlateDoc
@@ -30,6 +29,7 @@ export function PlateView({
   loupeOn: boolean
   loupeZoom: number
   facing: FaceFacing
+  ink: InkId
   onCommit: (annotation: Annotation, openLock: boolean) => void
 }) {
   const viewport = useRef<HTMLDivElement>(null)
@@ -263,18 +263,25 @@ export function PlateView({
               <AnnotationShape key={ann.id} ann={ann} viewScale={view.scale} />
             ))}
             {line ? (
-              <line x1={line.a.x} y1={line.a.y} x2={line.cursor.x} y2={line.cursor.y} stroke={LOCK} strokeWidth={1.6 / view.scale} />
+              <line
+                x1={line.a.x}
+                y1={line.a.y}
+                x2={line.cursor.x}
+                y2={line.cursor.y}
+                stroke={inkStroke(ink)}
+                strokeWidth={1.6 / view.scale}
+              />
             ) : null}
             {cylinder
               ? cylinder.points.map((point, index) => (
-                  <circle key={index} cx={point.x} cy={point.y} r={4 / view.scale} fill={LOCK} />
+                  <circle key={index} cx={point.x} cy={point.y} r={4 / view.scale} fill={inkStroke(ink)} />
                 ))
               : null}
             {area && area.points.length > 0 ? (
               <polyline
                 points={[...area.points, area.cursor].filter((point): point is Point => point != null).map((point) => `${point.x},${point.y}`).join(' ')}
                 fill="none"
-                stroke={LOCK}
+                stroke={inkStroke(ink)}
                 strokeWidth={1.4 / view.scale}
               />
             ) : null}
@@ -290,9 +297,19 @@ export function PlateView({
 
 function AnnotationShape({ ann, viewScale }: { ann: Annotation; viewScale: number }) {
   const width = 2.2 / viewScale
+  const stroke = inkStroke(ann.color)
   if (ann.kind === 'measure') {
-    const stroke = ann.knownMetres ? LOCK : INK
-    return <line x1={ann.a.x} y1={ann.a.y} x2={ann.b.x} y2={ann.b.y} stroke={stroke} strokeWidth={ann.knownMetres ? width * 1.35 : width} />
+    return (
+      <line
+        x1={ann.a.x}
+        y1={ann.a.y}
+        x2={ann.b.x}
+        y2={ann.b.y}
+        stroke={stroke}
+        strokeWidth={ann.knownMetres ? width * 1.35 : width}
+        data-color={ann.color ?? 'cyan'}
+      />
+    )
   }
   if (ann.kind === 'horizon') {
     return (
@@ -301,23 +318,34 @@ function AnnotationShape({ ann, viewScale }: { ann: Annotation; viewScale: numbe
         y1={ann.a.y}
         x2={ann.b.x}
         y2={ann.b.y}
-        stroke={BRASS}
+        stroke={stroke}
         strokeWidth={width}
         strokeDasharray={`${10 / viewScale} ${6 / viewScale}`}
+        data-color={ann.color ?? 'cyan'}
       />
     )
   }
   if (ann.kind === 'waterline') {
-    return <line x1={ann.a.x} y1={ann.a.y} x2={ann.b.x} y2={ann.b.y} stroke={BRASS} strokeWidth={width * 1.2} />
+    return (
+      <line
+        x1={ann.a.x}
+        y1={ann.a.y}
+        x2={ann.b.x}
+        y2={ann.b.y}
+        stroke={stroke}
+        strokeWidth={width * 1.2}
+        data-color={ann.color ?? 'cyan'}
+      />
+    )
   }
   if (ann.kind === 'cylinder') {
     return (
-      <g stroke={INK} fill="none" strokeWidth={width}>
+      <g stroke={stroke} fill="none" strokeWidth={width} data-color={ann.color ?? 'cyan'}>
         <line x1={ann.railA[0].x} y1={ann.railA[0].y} x2={ann.railA[1].x} y2={ann.railA[1].y} />
         <line x1={ann.railB[0].x} y1={ann.railB[0].y} x2={ann.railB[1].x} y2={ann.railB[1].y} />
       </g>
     )
   }
   const d = ann.points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ') + ' Z'
-  return <path d={d} fill={INK} fillOpacity={0.16} stroke={INK} strokeWidth={width} />
+  return <path d={d} fill={stroke} fillOpacity={0.16} stroke={stroke} strokeWidth={width} data-color={ann.color ?? 'cyan'} />
 }

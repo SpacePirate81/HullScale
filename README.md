@@ -3,7 +3,7 @@
 HullScale is a photo-scale measuring instrument: lock a known length on a photograph and read
 every other distance, projected area, and an upper-bound box around the drawn faces.
 
-The running app is version 2.0.1, a Vite + React + TypeScript rebuild. The math lives in `src/math` and does not
+The running app is version 2.0.2, a Vite + React + TypeScript rebuild. The math lives in `src/math` and does not
 import the screens. Decisions that the owner can change later (Starship length 50.3 m, horizon-only
 scale, optional angle, cylinder volume on the readout) are in `src/math/decisions.ts`.
 
