@@ -24,19 +24,21 @@ export function Toolbar({
 }) {
   return (
     <nav className="toolbar" aria-label="Tools">
-      {TOOLS.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          className="tool"
-          aria-pressed={tool === item.id}
-          title={item.hint}
-          onClick={() => onTool(item.id)}
-        >
-          <kbd>{item.key}</kbd>
-          <small>{item.label}</small>
-        </button>
-      ))}
+      <div className="tool-row">
+        {TOOLS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className="tool"
+            aria-pressed={tool === item.id}
+            title={item.hint}
+            onClick={() => onTool(item.id)}
+          >
+            <kbd>{item.key}</kbd>
+            <small>{item.label}</small>
+          </button>
+        ))}
+      </div>
       <div className="palette" role="radiogroup" aria-label="Overlay color">
         {INKS.map((item) => (
           <button

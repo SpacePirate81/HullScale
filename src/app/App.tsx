@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LENGTH_UNITS, type ClickClass, type LengthUnit, type LibraryEntry } from '../math'
 import { Home } from './Home'
 import { LockDialog } from './LockDialog'
@@ -26,6 +26,7 @@ export function App() {
   const [custom, setCustom] = useState<LibraryEntry[]>([])
   const [facing, setFacing] = useState<FaceFacing>('side')
   const [ink, setInk] = useState<InkId>(DEFAULT_INK)
+  const colorEdit = useRef(false)
   const active = docs.find((doc) => doc.id === activeId) ?? null
 
   function patchDoc(id: string, fn: (doc: PlateDoc) => PlateDoc) {
@@ -87,13 +88,14 @@ export function App() {
       }
       return { ...doc, annotations: [...annotations, painted], structures }
     })
+    colorEdit.current = false
     setSelectedId(painted.id)
     if (openLock) setLockId(painted.id)
   }
 
   function chooseInk(next: InkId) {
     setInk(next)
-    if (!active || !selectedId) return
+    if (!colorEdit.current || !active || !selectedId) return
     patchDoc(active.id, (doc) => ({
       ...doc,
       annotations: doc.annotations.map((ann) => (ann.id === selectedId ? { ...ann, color: next } : ann)),
@@ -101,6 +103,7 @@ export function App() {
   }
 
   function selectAnnotation(id: string) {
+    colorEdit.current = true
     setSelectedId(id)
     const ann = active?.annotations.find((item) => item.id === id)
     if (ann?.color) setInk(ann.color)
@@ -140,6 +143,7 @@ export function App() {
       if (event.key === 'Escape') setLockId(null)
       if ((event.key === 'Delete' || event.key === 'Backspace') && active && selectedId) {
         patchDoc(active.id, (doc) => ({ ...doc, annotations: doc.annotations.filter((ann) => ann.id !== selectedId) }))
+        colorEdit.current = false
         setSelectedId(null)
       }
     }
@@ -207,7 +211,15 @@ export function App() {
       </header>
       {active ? (
         <div className="workspace">
-          <Toolbar tool={tool} onTool={setTool} ink={ink} onInk={chooseInk} />
+          <Toolbar
+            tool={tool}
+            onTool={(next) => {
+              colorEdit.current = false
+              setTool(next)
+            }}
+            ink={ink}
+            onInk={chooseInk}
+          />
           <PlateView
             key={active.id}
             doc={active}
@@ -238,6 +250,7 @@ export function App() {
             onLock={setLockId}
             onDelete={(id) => {
               patchDoc(active.id, (doc) => ({ ...doc, annotations: doc.annotations.filter((ann) => ann.id !== id) }))
+              colorEdit.current = false
               setSelectedId(null)
             }}
             onCopy={() => {
