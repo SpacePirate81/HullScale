@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { LENGTH_UNITS, type ClickClass, type LengthUnit, type LibraryEntry } from '../math'
 import { Home } from './Home'
 import { LockDialog } from './LockDialog'
+import { DEFAULT_INK, type InkId } from './palette'
 import { PlateView } from './PlateView'
 import { Readout } from './Readout'
 import { reportText } from './report'
@@ -24,6 +25,7 @@ export function App() {
   const [lockId, setLockId] = useState<string | null>(null)
   const [custom, setCustom] = useState<LibraryEntry[]>([])
   const [facing, setFacing] = useState<FaceFacing>('side')
+  const [ink, setInk] = useState<InkId>(DEFAULT_INK)
   const active = docs.find((doc) => doc.id === activeId) ?? null
 
   function patchDoc(id: string, fn: (doc: PlateDoc) => PlateDoc) {
@@ -73,19 +75,35 @@ export function App() {
 
   function commit(annotation: Annotation, openLock: boolean) {
     if (!active) return
+    const painted = { ...annotation, color: ink }
     patchDoc(active.id, (doc) => {
       let annotations = doc.annotations
-      if (annotation.kind === 'horizon' || annotation.kind === 'waterline') {
-        annotations = annotations.filter((item) => item.kind !== annotation.kind)
+      if (painted.kind === 'horizon' || painted.kind === 'waterline') {
+        annotations = annotations.filter((item) => item.kind !== painted.kind)
       }
       let structures = doc.structures
-      if (annotation.kind === 'area' && !structures.some((item) => item.id === annotation.structureId)) {
-        structures = [...structures, { id: annotation.structureId, name: `Structure ${structures.length + 1}` }]
+      if (painted.kind === 'area' && !structures.some((item) => item.id === painted.structureId)) {
+        structures = [...structures, { id: painted.structureId, name: `Structure ${structures.length + 1}` }]
       }
-      return { ...doc, annotations: [...annotations, annotation], structures }
+      return { ...doc, annotations: [...annotations, painted], structures }
     })
-    setSelectedId(annotation.id)
-    if (openLock) setLockId(annotation.id)
+    setSelectedId(painted.id)
+    if (openLock) setLockId(painted.id)
+  }
+
+  function chooseInk(next: InkId) {
+    setInk(next)
+    if (!active || !selectedId) return
+    patchDoc(active.id, (doc) => ({
+      ...doc,
+      annotations: doc.annotations.map((ann) => (ann.id === selectedId ? { ...ann, color: next } : ann)),
+    }))
+  }
+
+  function selectAnnotation(id: string) {
+    setSelectedId(id)
+    const ann = active?.annotations.find((item) => item.id === id)
+    if (ann?.color) setInk(ann.color)
   }
 
   function assignLock(entry: LibraryEntry, tolerance: number) {
@@ -189,7 +207,7 @@ export function App() {
       </header>
       {active ? (
         <div className="workspace">
-          <Toolbar tool={tool} onTool={setTool} />
+          <Toolbar tool={tool} onTool={setTool} ink={ink} onInk={chooseInk} />
           <PlateView
             key={active.id}
             doc={active}
@@ -197,13 +215,14 @@ export function App() {
             loupeOn={loupeOn}
             loupeZoom={loupeZoom}
             facing={facing}
+            ink={ink}
             onCommit={commit}
           />
           <Readout
             doc={active}
             unit={unit}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={selectAnnotation}
             onChangeMeasure={(id, patch) =>
               patchDoc(active.id, (doc) => ({
                 ...doc,

@@ -1,4 +1,5 @@
 import type { ClickClass, EdgeKind, FaceFacing, PlaneTag, Point, TopLengthAxis } from '../math'
+import type { InkId } from './palette'
 
 export type { FaceFacing }
 
@@ -21,6 +22,8 @@ export type MeasureAnn = {
   angleDeg?: number | null
   angleUncertaintyDeg?: number | null
   plane?: PlaneTag
+  /** Overlay ink. Unset drawings use the default cyan. */
+  color?: InkId
 }
 
 export type CylinderAnn = {
@@ -31,6 +34,7 @@ export type CylinderAnn = {
   label?: string
   libraryId?: string
   knownDiameterMetres?: number
+  color?: InkId
 }
 
 export type AreaAnn = {
@@ -42,6 +46,7 @@ export type AreaAnn = {
   turnDeg?: number | null
   /** Top view only. Which way the ship's length runs. Unset: match the other faces. */
   lengthAxis?: TopLengthAxis | null
+  color?: InkId
 }
 
 export type HorizonAnn = {
@@ -49,6 +54,7 @@ export type HorizonAnn = {
   kind: 'horizon'
   a: Point
   b: Point
+  color?: InkId
 }
 
 export type WaterlineAnn = {
@@ -56,6 +62,7 @@ export type WaterlineAnn = {
   kind: 'waterline'
   a: Point
   b: Point
+  color?: InkId
 }
 
 export type Annotation = MeasureAnn | CylinderAnn | AreaAnn | HorizonAnn | WaterlineAnn

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { LENGTH_UNITS, PLANE_ANGLE_LIMIT_DEG, type LengthUnit, type TopLengthAxis } from '../math'
+import { inkLabel, inkStroke } from './palette'
 import { buildReport } from './report'
-import type { AreaAnn, MeasureAnn, PlateDoc } from './types'
+import type { Annotation, AreaAnn, MeasureAnn, PlateDoc } from './types'
 
 export function Readout({
   doc,
@@ -59,7 +60,7 @@ export function Readout({
             onClick={() => onSelect(row.id)}
           >
             <header>
-              <span className={row.tone === 'red' ? 'mark bad' : row.tone === 'amber' ? 'mark warn' : 'mark'}>{row.mark}</span>
+              <Mark ann={ann} letter={row.mark} tone={row.tone} />
               <div>
                 <div>{row.label}</div>
                 <div className="primary">{row.primary}</div>
@@ -74,10 +75,12 @@ export function Readout({
           </article>
         )
       })}
-      {report.cylinders.map((row) => (
+      {report.cylinders.map((row) => {
+        const ann = doc.annotations.find((item) => item.id === row.id)
+        return (
         <article key={row.id} className="row" onClick={() => onSelect(row.id)}>
           <header>
-            <span className="mark">{row.name.slice(0, 1)}</span>
+            <Mark ann={ann} letter={row.name.slice(0, 1)} />
             <div>
               <div>{row.name}</div>
               <div className="primary">{row.text}</div>
@@ -95,7 +98,8 @@ export function Readout({
             </div>
           ) : null}
         </article>
-      ))}
+        )
+      })}
       <h2>AREA</h2>
       {report.areas.length === 0 ? <p className="note">Area is the face as it appears, until you type a turn.</p> : null}
       {report.areas.map((row) => {
@@ -103,7 +107,7 @@ export function Readout({
         return (
           <article key={row.id} className="row" onClick={() => onSelect(row.id)}>
             <header>
-              <span className="mark">{row.mark}</span>
+              <Mark ann={ann} letter={row.mark} />
               <div>
                 <div>{row.facing} face</div>
                 <div className="primary">{row.primary}</div>
@@ -156,6 +160,16 @@ export function Readout({
       </button>
       <p className="note">Unit now showing: {LENGTH_UNITS.includes(unit) ? unit : unit}. Lens distortion is not in the bar.</p>
     </aside>
+  )
+}
+
+function Mark({ ann, letter, tone }: { ann: Annotation | undefined; letter: string; tone?: string }) {
+  const stroke = inkStroke(ann?.color)
+  const toneClass = tone === 'red' ? ' bad' : tone === 'amber' ? ' warn' : ''
+  return (
+    <span className={`mark${toneClass}`} style={{ background: stroke, color: inkLabel(stroke) }}>
+      {letter}
+    </span>
   )
 }
 
